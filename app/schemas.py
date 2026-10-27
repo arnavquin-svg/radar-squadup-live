@@ -17,7 +17,7 @@ from pydantic import AfterValidator, BaseModel, ConfigDict, Field, field_validat
 Role = Literal["developer", "designer", "domain_expert", "presenter"]
 Experience = Literal["first_time", "some", "veteran"]
 Language = Literal["en", "hi", "mr"]
-Platform = Literal["whatsapp", "telegram", "instagram", "discord", "other"]
+Platform = Literal["whatsapp", "telegram", "instagram", "discord", "facebook", "linkedin", "reddit", "other"]
 
 MAX_ID = 2_147_483_647
 PAYLOAD_RE = re.compile(r"^(o|r|e)_[A-Za-z0-9]{1,40}$")

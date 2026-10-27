@@ -155,10 +155,30 @@ select.field { appearance: none; background-image: linear-gradient(45deg, transp
   .fact { min-height: 0; transform: none !important; margin: 0 !important; }
 }
 
-.where { border-block: 1px solid var(--line); padding: 26px 0; margin-top: 72px; }
-.where .wrap { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem 2.2rem; }
-.where .label { font-size: .9rem; color: var(--muted); margin-right: auto; }
-.where .platform { font-family: var(--serif); font-size: clamp(1.6rem, 3vw, 2.3rem); font-style: italic; }
+.where { border-block: 1px solid var(--line); padding: 24px 0 26px; margin-top: 72px; overflow: hidden; }
+.where .wrap { display: grid; gap: 16px; }
+.where .label { font-size: .9rem; color: var(--muted); }
+.platform-marquee { overflow: hidden; width: 100%; -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
+.platform-track { display: flex; width: max-content; animation: platform-scroll 32s linear infinite; }
+.platform-group { display: flex; align-items: center; gap: clamp(28px, 5vw, 68px); flex: none; padding-right: clamp(28px, 5vw, 68px); }
+.where .platform { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; color: var(--ink); font-size: 16px; font-weight: 600; }
+.where .platform svg { width: 27px; height: 27px; fill: currentColor; flex: none; }
+.where .platform.whatsapp { color: #168C53; }
+.where .platform.telegram { color: #249BD7; }
+.where .platform.instagram { color: #C13584; }
+.where .platform.discord { color: #5865F2; }
+.where .platform.facebook { color: #1877F2; }
+.where .platform.linkedin { color: #0A66C2; }
+.where .platform.reddit { color: #FF4500; }
+@keyframes platform-scroll { to { transform: translateX(-50%); } }
+@media (hover: hover) {
+  .platform-marquee:hover .platform-track { animation-play-state: paused; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .platform-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  .platform-track { animation: none; }
+  .platform-group[aria-hidden="true"] { display: none; }
+}
 
 .section { padding: 120px 0; }
 .section-head { display: flex; align-items: center; gap: .9rem; margin-bottom: 1.6rem; }
@@ -492,13 +512,6 @@ fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 .step:hover .art .tick { transform: scale(1.18); }
 .step .art .tap { transition: fill .3s; }
 .step:hover .art .tap2 { fill: #F2542D; }
-
-/* Platform names */
-.where .platform { transition: color .2s, transform .3s var(--ease-out); cursor: default; }
-.where .platform:nth-of-type(1):hover { color: #1FA855; transform: translateY(-3px) rotate(-2deg); }
-.where .platform:nth-of-type(2):hover { color: var(--sky-text); transform: translateY(-3px) rotate(2deg); }
-.where .platform:nth-of-type(3):hover { color: var(--action); transform: translateY(-3px) rotate(-2deg); }
-.where .platform:nth-of-type(4):hover { color: #8A5A00; transform: translateY(-3px) rotate(2deg); }
 
 /* Scroll reveal (class added by site.js only when motion is allowed) */
 html.motion .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s var(--ease-out), transform .8s var(--ease-out); transition-delay: var(--d, 0ms); }

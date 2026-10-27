@@ -56,7 +56,8 @@ CITY_REGIONAL_LANGUAGE: dict[str, str] = {
 }
 
 PLATFORM_LABELS = {"whatsapp": "WhatsApp", "telegram": "Telegram", "instagram": "Instagram",
-                   "discord": "Discord", "other": "chat"}
+                   "discord": "Discord", "facebook": "Facebook", "linkedin": "LinkedIn",
+                   "reddit": "Reddit", "other": "chat"}
 
 SUPPORTED_DRAFT_LANGUAGES = ("en", "hi", "mr")
 LANGUAGE_NAMES = {"en": "English", "hi": "Hindi", "mr": "Marathi"}

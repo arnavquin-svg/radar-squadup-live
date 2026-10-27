@@ -16,7 +16,7 @@
   const THEMES = [['ai', 'AI'], ['hackathon', 'Hackathons'], ['beginner', 'Beginner-friendly'], ['robotics', 'Robotics'], ['web', 'Web dev'],
                   ['data', 'Data'], ['design', 'Design'], ['science', 'Science'], ['startup', 'Startups'], ['cultural', 'Culture'],
                   ['social-impact', 'Social impact'], ['gaming', 'Gaming'], ['cybersecurity', 'Cybersecurity']];
-  const PLATFORM = { whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', discord: 'Discord', other: 'Other' };
+  const PLATFORM = { whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', discord: 'Discord', facebook: 'Facebook', linkedin: 'LinkedIn', reddit: 'Reddit', other: 'Other' };
   const LANG = { en: 'English', hi: 'Hindi', mr: 'Marathi' };
   const VIEWS = ['requests', 'overview', 'radar', 'outreach', 'squads'];
   const EVENT_VIEWS = ['overview', 'radar', 'outreach', 'squads'];
