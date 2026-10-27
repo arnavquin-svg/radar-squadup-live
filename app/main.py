@@ -1,4 +1,4 @@
-"""Radar + SquadUp API and website.
+"""RadiUp.ai API and website.
 
 Run (development):  uvicorn app.main:app --reload
 Production:         APP_ENV=production uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers
@@ -980,11 +980,11 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
             log.warning("ADMIN_TOKEN was not set, so a temporary one was generated for this run.")
             log.warning("Organiser access key for this run: %s", settings.admin_token)
             log.warning("Set ADMIN_TOKEN and BOT_API_KEY in .env to keep them stable between restarts.")
-        log.info("Radar + SquadUp started in %s mode", settings.env)
+        log.info("RadiUp.ai started in %s mode", settings.env)
         yield
 
     app = FastAPI(
-        title="Radar + SquadUp API",
+        title="RadiUp.ai API",
         version="1.1.0",
         description="Radar brings people in. SquadUp makes each person bring more.",
         lifespan=lifespan,

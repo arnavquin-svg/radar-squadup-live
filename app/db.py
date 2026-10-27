@@ -1,4 +1,4 @@
-"""SQLite persistence layer for Radar + SquadUp.
+"""SQLite persistence layer for RadiUp.ai.
 
 One short-lived connection per unit of work keeps FastAPI's thread pool safe
 without global locking. Every query in the codebase uses bound parameters;

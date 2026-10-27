@@ -1,4 +1,4 @@
-/* Radar + SquadUp organiser desk.
+/* RadiUp.ai organiser desk.
    No frameworks, no inline handlers, no inline styles: compatible with a strict Content-Security-Policy.
    Everything rendered from data goes through esc(). */
 (() => {

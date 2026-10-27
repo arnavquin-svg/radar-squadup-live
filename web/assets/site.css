@@ -1,4 +1,4 @@
-/* Radar + SquadUp — shared styles for the website and the organiser desk.
+/* RadiUp.ai — shared styles for the website and the organiser desk.
    Light only: sand and white, warm ink, bright accents. No inline styles anywhere (strict CSP). */
 
 :root {
@@ -441,3 +441,97 @@ fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 .request .chips { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .7rem; }
 .cta .lede { margin-top: 1.2rem; }
 .view-head a { color: var(--action); }
+
+/* ================================================================== BRAND */
+.wordmark .tld { color: var(--action); font-style: italic; }
+
+/* ================================================================== INTERACTION
+   Hover lift + cursor glow on boxes, scroll reveals, scroll-linked fact cards.
+   Everything here is progressive: without JS or with reduced motion, the page is complete and still. */
+:root { --ease-out: cubic-bezier(.2, .8, .2, 1); --shadow-lift: 0 18px 40px -18px rgba(70, 52, 20, .28), 0 2px 6px rgba(70, 52, 20, .06); }
+
+.lift { transition: transform .35s var(--ease-out), box-shadow .35s var(--ease-out), border-color .25s; will-change: transform; }
+.lift:hover { box-shadow: var(--shadow-lift); border-color: var(--line-strong); }
+.spot { background-image: radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), rgba(255, 182, 39, .16), transparent 62%); }
+.fact.spot:nth-child(2), .stat.spot:nth-child(2) { background-image: radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), rgba(255, 255, 255, .45), transparent 62%); }
+
+/* Boxes that are not already transformed */
+.step.lift:hover, .panel.lift:hover, .team.lift:hover, .request.lift:hover, .form-card.lift:hover,
+.numbers div.lift:hover, .signin .card.lift:hover { transform: translateY(-6px); }
+.promises li { transition: background-color .25s, padding .25s var(--ease-out); border-radius: 10px; }
+.promises li:hover { background: var(--paper); padding-left: .8rem; padding-right: .8rem; }
+.next-steps li { transition: background-color .25s, padding .25s var(--ease-out); border-radius: 10px; }
+.next-steps li:hover { background: var(--paper); padding-left: .7rem; }
+.ranked li { transition: background-color .2s, transform .25s var(--ease-out); }
+.ranked li:hover { transform: translateX(6px); }
+.letters button { transition: background-color .2s, padding .25s var(--ease-out); }
+.letters button:hover { padding-left: 1rem; }
+.chip, .check-chip span { transition: transform .2s var(--ease-out), background-color .2s, border-color .2s; }
+.chip:hover, .check-chip span:hover { transform: translateY(-2px); }
+.btn { transition: background-color .15s, border-color .15s, color .15s, transform .2s var(--ease-out), box-shadow .2s; }
+.btn-primary:hover:not(:disabled) { box-shadow: 0 10px 22px -10px rgba(214, 58, 18, .7); transform: translateY(-1px); }
+.btn-outline:hover:not(:disabled), .btn-paper:hover:not(:disabled) { transform: translateY(-1px); }
+
+/* Fact cards: tilted index cards that fan out as you scroll and lift on hover */
+.fact { transform: translate(var(--tx, 0px), calc(var(--ty, 0px) + var(--lift, 0px))) rotate(var(--rot, 0deg)) !important;
+        transition: transform .45s var(--ease-out), box-shadow .35s var(--ease-out); }
+.fact:nth-child(1) { --rot: calc(-3deg - var(--s, 0) * 4deg); --tx: calc(var(--s, 0) * -28px); --ty: 8px; }
+.fact:nth-child(2) { --rot: calc(1.5deg - var(--s, 0) * 1.5deg); --ty: calc(var(--s, 0) * -10px); }
+.fact:nth-child(3) { --rot: calc(-1deg + var(--s, 0) * 4.5deg); --tx: calc(var(--s, 0) * 28px); --ty: 12px; }
+.fact:hover { --lift: -14px; box-shadow: var(--shadow-lift); z-index: 2; }
+@media (max-width: 760px) { .fact { --rot: 0deg !important; --tx: 0px !important; --ty: 0px !important; } }
+
+/* Step illustrations come alive on hover */
+.step .art svg { transition: transform .5s var(--ease-out); }
+.step:hover .art svg { transform: scale(1.08) rotate(-3deg); }
+.step .art .sweep { transform-origin: 60px 55px; transition: transform .9s var(--ease-out); }
+.step:hover .art .sweep { transform: rotate(140deg); }
+.step .art .seat { transition: fill .4s, stroke-dasharray .4s; }
+.step:hover .art .seat { fill: #FFB627; stroke-dasharray: 0; }
+.step .art .tick { transform-origin: 92px 28px; transition: transform .4s var(--ease-out); }
+.step:hover .art .tick { transform: scale(1.18); }
+.step .art .tap { transition: fill .3s; }
+.step:hover .art .tap2 { fill: #F2542D; }
+
+/* Platform names */
+.where .platform { transition: color .2s, transform .3s var(--ease-out); cursor: default; }
+.where .platform:nth-of-type(1):hover { color: #1FA855; transform: translateY(-3px) rotate(-2deg); }
+.where .platform:nth-of-type(2):hover { color: var(--sky-text); transform: translateY(-3px) rotate(2deg); }
+.where .platform:nth-of-type(3):hover { color: var(--action); transform: translateY(-3px) rotate(-2deg); }
+.where .platform:nth-of-type(4):hover { color: #8A5A00; transform: translateY(-3px) rotate(2deg); }
+
+/* Scroll reveal (class added by site.js only when motion is allowed) */
+html.motion .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s var(--ease-out), transform .8s var(--ease-out); transition-delay: var(--d, 0ms); }
+html.motion .reveal.in { opacity: 1; transform: none; }
+html.motion .fact.reveal { opacity: 0; }
+html.motion .fact.reveal.in { opacity: 1; }
+html.motion .bubble.reveal, html.motion .mini-buttons.reveal { transform: translateY(12px) scale(.96); }
+html.motion .bubble.reveal.in, html.motion .mini-buttons.reveal.in { transform: none; }
+
+/* Nav firms up after scrolling; reading progress line */
+.nav { transition: box-shadow .3s, background-color .3s, top .3s var(--ease-out); }
+.nav.scrolled { background: rgba(255, 255, 255, .96); box-shadow: 0 10px 30px -18px rgba(70, 52, 20, .35); }
+.progress-line { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 50; background: var(--tomato); transform-origin: 0 50%; transform: scaleX(0); pointer-events: none; }
+
+/* Desk: views and cards ease in */
+html.motion .view:not(.hidden) { animation: view-in .45s var(--ease-out); }
+@keyframes view-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+html.motion .teams .team, html.motion .requests .request, html.motion .stats .stat { animation: card-in .5s var(--ease-out) both; }
+html.motion .teams .team:nth-child(2), html.motion .requests .request:nth-child(2), html.motion .stats .stat:nth-child(2) { animation-delay: 60ms; }
+html.motion .teams .team:nth-child(3), html.motion .requests .request:nth-child(3), html.motion .stats .stat:nth-child(3) { animation-delay: 120ms; }
+html.motion .teams .team:nth-child(n+4), html.motion .requests .request:nth-child(n+4) { animation-delay: 180ms; }
+@keyframes card-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; } }
+.stat { transition: transform .35s var(--ease-out), box-shadow .35s var(--ease-out); }
+.stat:nth-child(1):hover { transform: rotate(-1.2deg) translateY(-8px); box-shadow: var(--shadow-lift); }
+.stat:nth-child(2):hover { transform: rotate(.8deg) translateY(-8px); box-shadow: var(--shadow-lift); }
+.stat:nth-child(3):hover { transform: rotate(-.5deg) translateY(-8px); box-shadow: var(--shadow-lift); }
+.seats li { transition: transform .25s var(--ease-out); }
+.team:hover .seats li:not(.open) { transform: translateY(-2px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .fact { --s: 0 !important; }
+  .lift:hover, .fact:hover, .stat:hover, .ranked li:hover { transform: none !important; }
+  .progress-line { display: none; }
+}
+
+.ledger li.empty { display: block; }

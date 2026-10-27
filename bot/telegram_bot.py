@@ -8,6 +8,7 @@ Run from the repo root (the API must be running):
 """
 from __future__ import annotations
 
+import asyncio
 import functools
 import logging
 import os
@@ -21,6 +22,7 @@ from zoneinfo import ZoneInfo
 import httpx
 from telegram import BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
+from telegram.error import InvalidToken, NetworkError, TelegramError, TimedOut
 from telegram.ext import (
     Application,
     ApplicationBuilder,
@@ -80,8 +82,8 @@ class RadarApi:
     def __init__(self, base_url: str, service_key: str) -> None:
         self.client = httpx.AsyncClient(
             base_url=base_url,
-            timeout=httpx.Timeout(10.0, connect=5.0),
-            headers={"X-Service-Key": service_key, "User-Agent": "squadup-bot/1.1"},
+            timeout=httpx.Timeout(75.0, connect=20.0),  # a sleeping free Render site needs ~1 minute to wake
+            headers={"X-Service-Key": service_key, "User-Agent": "radiup-bot/1.2"},
         )
 
     async def request(self, method: str, path: str, **kwargs: Any) -> Optional[Any]:
@@ -135,6 +137,10 @@ def guarded(handler):
             log.info("Input rejected for user %s: %s", update.effective_user.id if update.effective_user else "?", exc)
             if update.effective_chat:
                 await context.bot.send_message(update.effective_chat.id, t(lang_of(context), "input_rejected"))
+        except (httpx.TimeoutException, httpx.ConnectError) as exc:
+            log.warning("Website unreachable (%s). Is %s awake?", type(exc).__name__, API_URL)
+            if update.effective_chat:
+                await context.bot.send_message(update.effective_chat.id, t(lang_of(context), "server_waking"))
 
     return wrapper
 
@@ -533,17 +539,40 @@ async def on_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
 # --------------------------------------------------------------------------- #
 # Lifecycle
 # --------------------------------------------------------------------------- #
+async def wait_for_api(attempts: int = 12) -> bool:
+    """Wake the website (free hosting sleeps) and wait until it answers."""
+    for attempt in range(1, attempts + 1):
+        try:
+            response = await api.client.get("/api/health")
+            if response.status_code == 200:
+                log.info("Website is up at %s", API_URL)
+                return True
+        except httpx.HTTPError:
+            pass
+        log.info("Waiting for the website at %s to wake up (%d/%d)…", API_URL, attempt, attempts)
+        await asyncio.sleep(10)
+    log.warning("The website at %s didn't answer. The bot will keep running and retry on each message.", API_URL)
+    return False
+
+
 async def post_init(application: Application) -> None:
     global api
     api = RadarApi(API_URL, BOT_API_KEY)
-    await application.bot.set_my_commands([
-        BotCommand("start", "Register or see your squad"),
-        BotCommand("team", "Your team card"),
-        BotCommand("invite", "Invite teammates"),
-        BotCommand("confirm", "Confirm attendance"),
-        BotCommand("lang", "English / हिंदी"),
-        BotCommand("help", "All commands"),
-    ])
+    me = await application.bot.get_me()
+    log.info("Connected to Telegram as @%s", me.username)
+    try:
+        await application.bot.set_my_commands([
+            BotCommand("start", "Register or see your squad"),
+            BotCommand("team", "Your team card"),
+            BotCommand("invite", "Invite teammates"),
+            BotCommand("confirm", "Confirm attendance"),
+            BotCommand("lang", "English / हिंदी"),
+            BotCommand("help", "All commands"),
+        ])
+    except TelegramError as exc:  # cosmetic; never block start-up on it
+        log.warning("Couldn't set the command menu (%s); continuing.", exc)
+    if not await wait_for_api():
+        return
     # Job queues live in memory, so rebuild every pending reminder from the database on boot.
     try:
         targets = await api.get("/api/reminders") or []
@@ -570,6 +599,13 @@ def build_application() -> Application:
     application = (
         ApplicationBuilder()
         .token(TOKEN)
+        # Generous timeouts: slow or filtered networks often need more than the 5-second defaults.
+        .connect_timeout(30)
+        .read_timeout(30)
+        .write_timeout(30)
+        .pool_timeout(30)
+        .get_updates_connect_timeout(30)
+        .get_updates_read_timeout(40)
         .persistence(PicklePersistence(filepath=PERSISTENCE_FILE))
         .post_init(post_init)
         .post_shutdown(post_shutdown)
@@ -599,7 +635,15 @@ def build_application() -> Application:
 
 
 def main() -> None:
-    build_application().run_polling(allowed_updates=Update.ALL_TYPES)
+    try:
+        build_application().run_polling(allowed_updates=Update.ALL_TYPES, bootstrap_retries=5)
+    except (TimedOut, NetworkError) as exc:
+        raise SystemExit(
+            f"Couldn't reach Telegram ({exc}). This network may be blocking Telegram: try a phone hotspot, "
+            "or run  python -m bot.check  to see exactly what's failing."
+        ) from None
+    except InvalidToken:
+        raise SystemExit("Telegram rejected the bot token. Copy it again from @BotFather into .env.") from None
 
 
 if __name__ == "__main__":

@@ -4,13 +4,14 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex" />
-<title>Organiser desk · Radar + SquadUp</title>
+<title>Organiser desk · RadiUp.ai</title>
 <meta name="theme-color" content="#F4EFE4" />
 <link rel="icon" href="/assets/mark.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" />
 <link rel="stylesheet" href="/assets/site.css" />
+<script src="/assets/site.js" defer></script>
 <script src="/assets/desk.js" defer></script>
 </head>
 <body>
@@ -18,7 +19,7 @@
 <!-- Sign in -->
 <main id="signin" class="signin hidden">
   <div class="card">
-    <a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" />Radar <em>&amp;</em> SquadUp</a>
+    <a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" /><span>RadiUp<span class="tld">.ai</span></span></a>
     <h1 class="display display-md">Organiser desk</h1>
     <p class="muted">Sign in with the access key set on your server (<code>ADMIN_TOKEN</code>).</p>
     <form id="signin-form" novalidate>
@@ -33,7 +34,7 @@
 <!-- Desk -->
 <div id="desk" class="hidden">
   <nav class="nav" aria-label="Desk">
-    <a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" /><span class="hide-sm">Radar <em>&amp;</em> SquadUp</span></a>
+    <a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" /><span class="hide-sm">RadiUp<span class="tld">.ai</span></span></a>
     <div class="nav-links" role="tablist" aria-label="Sections">
       <button role="tab" data-view="requests">Requests <span class="num" id="new-count"></span></button>
       <button role="tab" data-view="overview">Overview</button>

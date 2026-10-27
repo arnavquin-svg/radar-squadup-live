@@ -1,10 +1,12 @@
-# Radar + SquadUp
+# RadiUp.ai
 
 > Radar brings people in. SquadUp makes each person bring more.
 
+RadiUp.ai runs on two engines: **Radar** (finding and reaching the right student groups) and **SquadUp** (sign-ups, teams and reminders in Telegram).
+
 Built for the **X AI Tech Ideathon, Problem Statement 2: AI for Event Reach and Registration.**
 
-First-time organisers of hackathons, olympiads, science fairs and fests don't have followers or ad budgets, so their reach stops at their own circle. Radar + SquadUp gets the first hundred sign-ups through the people who already have the audience: club and group admins.
+First-time organisers of hackathons, olympiads, science fairs and fests don't have followers or ad budgets, so their reach stops at their own circle. RadiUp.ai gets the first hundred sign-ups through the people who already have the audience: club and group admins.
 
 ### Who uses what
 
@@ -102,7 +104,7 @@ In development the server loads a sample directory of 32 made-up community group
 
 1. In Telegram, message **@BotFather** → `/newbot`. Copy the token into `.env` as `TELEGRAM_BOT_TOKEN`, and the bot's username as `TELEGRAM_BOT_USERNAME`.
 2. Restart the API so links use your bot's username.
-3. In a second terminal: `python -m bot.telegram_bot` (it reads `.env` itself).
+3. In a second terminal, check everything is connected with `python -m bot.check`, then start the bot with `python -m bot.telegram_bot` (both read `.env` themselves).
 4. Open an approved link from the desk on your phone and register.
 
 Bot commands: `/start`, `/team`, `/invite`, `/confirm`, `/lang`, `/help`, and `/demo_reminder` (sends the 1-day reminder in 10 seconds, for demos).

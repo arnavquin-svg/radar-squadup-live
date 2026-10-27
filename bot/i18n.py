@@ -44,7 +44,7 @@ STRINGS: dict[str, dict[str, Any]] = {
         "no_events": "No events are open for registration right now. Please check back soon!",
         "error": "Something went wrong on our side. Please try again in a moment.",
         "lang_set": "Language set to English.",
-        "help": ("*SquadUp commands*\n"
+        "help": ("*RadiUp.ai commands*\n"
                  "/start — register or see your squad\n"
                  "/team — your team card\n"
                  "/invite — your invite link\n"
@@ -58,6 +58,7 @@ STRINGS: dict[str, dict[str, Any]] = {
         "demo_scheduled": "A sample reminder will arrive in 10 seconds.",
         "slow_down": "One moment…",
         "input_rejected": "That didn't look right. Please send a plain name, under 120 characters.",
+        "server_waking": "Our server is waking up. Please try again in a minute.",
     },
     "hi": {
         "choose_language": "👋 *{event}* में आपका स्वागत है!\nअपनी भाषा चुनें:",
@@ -95,7 +96,7 @@ STRINGS: dict[str, dict[str, Any]] = {
         "no_events": "अभी कोई इवेंट रजिस्ट्रेशन के लिए खुला नहीं है। जल्द ही फिर देखें!",
         "error": "हमारी तरफ़ से कुछ गड़बड़ हुई। कृपया थोड़ी देर में फिर कोशिश करें।",
         "lang_set": "भाषा हिंदी कर दी गई।",
-        "help": ("*SquadUp कमांड*\n"
+        "help": ("*RadiUp.ai कमांड*\n"
                  "/start — रजिस्टर करें या अपनी टीम देखें\n"
                  "/team — आपका टीम कार्ड\n"
                  "/invite — आपका इनवाइट लिंक\n"
@@ -109,6 +110,7 @@ STRINGS: dict[str, dict[str, Any]] = {
         "demo_scheduled": "10 सेकंड में एक नमूना रिमाइंडर आएगा।",
         "slow_down": "एक पल…",
         "input_rejected": "यह सही नहीं लगा। कृपया 120 अक्षरों से कम का सादा नाम भेजें।",
+        "server_waking": "हमारा सर्वर शुरू हो रहा है। कृपया एक मिनट बाद फिर कोशिश करें।",
     },
 }
 
