@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<meta name="referrer" content="no-referrer" />
+<title>Track your event · Radar + SquadUp</title>
+<meta name="theme-color" content="#F4EFE4" />
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="/assets/site.css" />
+<script src="/assets/track.js" defer></script>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" />Radar <em>&amp;</em> SquadUp</a>
+  <div class="nav-links"><a href="/submit/">Submit an event</a></div>
+</nav>
+
+<main class="page">
+  <div class="wrap">
+    <!-- Ask for the link -->
+    <section id="ask" class="hidden" aria-labelledby="ask-title">
+      <h1 class="display display-lg" id="ask-title">Track your <em>event.</em></h1>
+      <p class="lede">Paste the private link you got when you submitted your event.</p>
+      <form class="form-card" id="ask-form" novalidate>
+        <label class="field-label" for="ask-link">Your private link</label>
+        <input class="field" id="ask-link" name="link" autocomplete="off" spellcheck="false" maxlength="300" placeholder="https://…/track/#t=…" />
+        <span class="field-error" id="ask-error" role="alert"></span>
+        <div class="form-foot"><small>Lost it? Email us your reference and we'll help.</small>
+          <button class="btn btn-primary" type="submit">Show progress <span class="arrow" aria-hidden="true">→</span></button></div>
+      </form>
+    </section>
+
+    <!-- Progress -->
+    <section id="progress" class="hidden" aria-live="polite">
+      <p class="kicker"><span class="dot" aria-hidden="true"></span><span id="p-ref"></span></p>
+      <h1 class="display display-lg" id="p-title"></h1>
+      <p class="lede" id="p-meta"></p>
+      <ol class="timeline" id="p-timeline"></ol>
+      <div class="form-card" id="p-body"></div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" />Radar <em>&amp;</em> SquadUp</a>
+    <span>This page only shows progress numbers, never anyone's personal details.</span>
+    <nav aria-label="Footer"><a href="/">Home</a><a href="/submit/">Submit an event</a></nav>
+  </div>
+</footer>
+</body>
+</html>

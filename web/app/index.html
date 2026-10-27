@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Organiser desk · Radar + SquadUp</title>
+<meta name="theme-color" content="#F4EFE4" />
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" />
+<link rel="stylesheet" href="/assets/site.css" />
+<script src="/assets/desk.js" defer></script>
+</head>
+<body>
+
+<!-- Sign in -->
+<main id="signin" class="signin hidden">
+  <div class="card">
+    <a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" />Radar <em>&amp;</em> SquadUp</a>
+    <h1 class="display display-md">Organiser desk</h1>
+    <p class="muted">Sign in with the access key set on your server (<code>ADMIN_TOKEN</code>).</p>
+    <form id="signin-form" novalidate>
+      <label class="field-label" for="access-key">Access key</label>
+      <input class="field" id="access-key" name="key" type="password" autocomplete="current-password" spellcheck="false" required minlength="8" maxlength="256" />
+      <span class="field-error" id="signin-error" role="alert"></span>
+      <button class="btn btn-primary" type="submit" id="signin-btn">Sign in <span class="arrow" aria-hidden="true">→</span></button>
+    </form>
+  </div>
+</main>
+
+<!-- Desk -->
+<div id="desk" class="hidden">
+  <nav class="nav" aria-label="Desk">
+    <a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" /><span class="hide-sm">Radar <em>&amp;</em> SquadUp</span></a>
+    <div class="nav-links" role="tablist" aria-label="Sections">
+      <button role="tab" data-view="requests">Requests <span class="num" id="new-count"></span></button>
+      <button role="tab" data-view="overview">Overview</button>
+      <button role="tab" data-view="radar">Radar</button>
+      <button role="tab" data-view="outreach">Outreach <span class="num" id="pending-count"></span></button>
+      <button role="tab" data-view="squads">Squads</button>
+    </div>
+    <span class="divider hide-sm" aria-hidden="true"></span>
+    <button class="btn btn-quiet btn-sm" id="signout">Sign out</button>
+  </nav>
+
+  <main class="desk-main">
+    <div class="wrap">
+      <header class="event-bar" id="event-bar">
+        <div class="event-picker">
+          <label for="event-select">Event</label>
+          <select id="event-select" class="event-select"></select>
+          <div class="event-meta" id="event-meta"></div>
+        </div>
+        <div class="event-actions">
+          <button class="btn btn-paper" id="btn-new-event">New event</button>
+        </div>
+      </header>
+
+      <!-- Requests from event hosts -->
+      <section id="view-requests" class="view hidden" aria-labelledby="requests-title">
+        <div class="view-head">
+          <div>
+            <h2 class="display display-md" id="requests-title">Events <em>waiting</em> for reach</h2>
+            <p>Hosts send these from the public form at <a href="/submit/" target="_blank" rel="noopener">/submit</a>. Accepting creates the event here so you can run Radar on it.</p>
+          </div>
+          <div class="seg" role="tablist" aria-label="Filter requests" id="request-filter">
+            <button role="tab" data-rfilter="new" aria-selected="true">New <span class="num" data-rcount="new"></span></button>
+            <button role="tab" data-rfilter="accepted" aria-selected="false">Accepted <span class="num" data-rcount="accepted"></span></button>
+            <button role="tab" data-rfilter="declined" aria-selected="false">Declined <span class="num" data-rcount="declined"></span></button>
+            <button role="tab" data-rfilter="all" aria-selected="false">All</button>
+          </div>
+        </div>
+        <div class="requests" id="requests"></div>
+      </section>
+
+      <!-- No events yet -->
+      <section id="view-empty" class="view hidden" aria-labelledby="empty-title">
+        <h2 class="display display-lg" id="empty-title">Start with <em>your event.</em></h2>
+        <p class="lede">Accept a host's request from the Requests tab, or create an event yourself. Radar then ranks the groups most likely to care and drafts a message for each admin, for you to review.</p>
+        <div class="hero-actions"><a class="btn btn-outline" href="#requests">See requests</a><button class="btn btn-primary" data-action="new-event">Create an event <span class="arrow" aria-hidden="true">→</span></button></div>
+      </section>
+
+      <!-- Overview -->
+      <section id="view-overview" class="view hidden" aria-labelledby="overview-title">
+        <div class="view-head">
+          <div>
+            <h2 class="display display-md" id="overview-title">How sign-ups are <em>arriving</em></h2>
+            <p>Updated every few seconds while this page is open.</p>
+          </div>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="grid-2">
+          <div class="panel"><h3>The funnel</h3><p class="sub" id="funnel-note">From written drafts to confirmed attendance.</p><ol class="ledger" id="funnel"></ol></div>
+          <div class="panel"><h3>Where sign-ups come from</h3><p class="sub">Approved groups, teammate invites and direct links.</p><ul class="ledger wide" id="sources"></ul></div>
+        </div>
+        <div class="grid-2 flip stack-gap">
+          <div class="panel"><h3>Skill mix</h3><p class="sub">Balanced squads need all four roles.</p><ul class="ledger" id="roles"></ul></div>
+          <div class="panel"><h3>Latest sign-ups</h3><ul class="list" id="recent"></ul></div>
+        </div>
+      </section>
+
+      <!-- Radar -->
+      <section id="view-radar" class="view hidden" aria-labelledby="radar-title">
+        <div class="view-head">
+          <div>
+            <h2 class="display display-md" id="radar-title">Who's most likely <em>to care</em></h2>
+            <p>Every group in the directory is scored against your event. The closer a dot sits to the centre, the better the fit.</p>
+          </div>
+          <div class="event-actions">
+            <button class="btn btn-paper" id="btn-add-community">Add a group</button>
+            <button class="btn btn-primary" id="btn-run-radar">Run Radar</button>
+          </div>
+        </div>
+        <dl class="profile" id="profile"></dl>
+        <div class="radar-grid">
+          <div class="panel scope-card">
+            <svg class="scope" id="scope" viewBox="0 0 360 360" role="img" aria-label="Map of ranked groups"></svg>
+            <div class="legend"><span><i class="bg-tomato"></i>Same city</span><span><i class="bg-sky"></i>Elsewhere or online</span><span>Bigger dot, bigger group</span></div>
+            <p class="sub" id="formula"></p>
+          </div>
+          <div>
+            <p class="sub" id="scanned"></p>
+            <ol class="ranked" id="ranking"></ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- Outreach -->
+      <section id="view-outreach" class="view hidden" aria-labelledby="outreach-title">
+        <div class="view-head">
+          <div>
+            <h2 class="display display-md" id="outreach-title">Review before <em>anything</em> goes out</h2>
+            <p>One message per group admin, who decides whether to forward it. Approving unlocks the tracked link; you send the message yourself.</p>
+          </div>
+          <div class="seg" role="tablist" aria-label="Filter messages" id="outreach-filter">
+            <button role="tab" data-filter="pending" aria-selected="true">To review <span class="num" data-count="pending"></span></button>
+            <button role="tab" data-filter="approved" aria-selected="false">Approved <span class="num" data-count="approved"></span></button>
+            <button role="tab" data-filter="rejected" aria-selected="false">Skipped <span class="num" data-count="rejected"></span></button>
+            <button role="tab" data-filter="all" aria-selected="false">All</button>
+          </div>
+        </div>
+        <div class="outreach-grid">
+          <ul class="letters" id="letters"></ul>
+          <div class="panel editor" id="editor"></div>
+        </div>
+      </section>
+
+      <!-- Squads -->
+      <section id="view-squads" class="view hidden" aria-labelledby="squads-title">
+        <div class="view-head">
+          <div>
+            <h2 class="display display-md" id="squads-title">Squads <em>forming</em></h2>
+            <p>People are seated where their skill is missing. Friends invited by a teammate get first claim on that team's open seats.</p>
+          </div>
+          <div class="event-actions">
+            <button class="btn btn-paper" id="btn-walkin">Add a walk-in</button>
+            <button class="btn btn-outline hidden" id="btn-simulate" title="Adds sample sign-ups, clearly marked as synthetic">Add 12 sample sign-ups</button>
+          </div>
+        </div>
+        <div class="squad-summary" id="squad-summary"></div>
+        <div class="teams" id="teams"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- New event -->
+<dialog id="dlg-event" aria-labelledby="dlg-event-title">
+  <form class="dialog-card" id="form-event" novalidate>
+    <h2 id="dlg-event-title">New event</h2>
+    <p class="intro">Radar only uses what you write here. It never adds details to the messages it drafts.</p>
+    <div class="form-grid">
+      <div><label class="field-label" for="ev-name">Event name</label>
+        <input class="field" id="ev-name" name="name" required minlength="3" maxlength="120" autocomplete="off" placeholder="Sonipat Robotics Olympiad" />
+        <span class="field-error" data-error-for="name"></span></div>
+      <div class="form-grid two">
+        <div><label class="field-label" for="ev-city">City</label>
+          <input class="field" id="ev-city" name="city" required minlength="2" maxlength="60" autocomplete="off" placeholder="Pune" />
+          <span class="field-error" data-error-for="city"></span></div>
+        <div><label class="field-label" for="ev-date">Date</label>
+          <input class="field" id="ev-date" name="start_date" type="date" />
+          <span class="field-error" data-error-for="start_date"></span></div>
+      </div>
+      <div><label class="field-label" for="ev-venue">Venue <span class="muted">(optional)</span></label>
+        <input class="field" id="ev-venue" name="venue" maxlength="160" autocomplete="off" placeholder="Main auditorium, XYZ College" />
+        <span class="field-error" data-error-for="venue"></span></div>
+      <div><label class="field-label" for="ev-desc">What happens at the event</label>
+        <textarea class="field" id="ev-desc" name="description" rows="3" maxlength="2000" placeholder="A 24-hour beginner-friendly hackathon where students build tools for local problems. Mentors on site."></textarea>
+        <span class="field-hint">The first sentence goes into every message, so make it count.</span>
+        <span class="field-error" data-error-for="description"></span></div>
+      <fieldset class="form-grid"><legend class="field-label">Topics</legend>
+        <div class="row" id="tag-picker"></div>
+        <input class="field" name="extra_tags" maxlength="200" autocomplete="off" placeholder="Other topics, separated by commas" />
+        <span class="field-error" data-error-for="tags"></span>
+      </fieldset>
+    </div>
+    <div class="form-error hidden" role="alert"></div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+      <button type="submit" class="btn btn-primary">Create and run Radar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Add community -->
+<dialog id="dlg-community" aria-labelledby="dlg-community-title">
+  <form class="dialog-card" id="form-community" novalidate>
+    <h2 id="dlg-community-title">Add a group</h2>
+    <p class="intro">A club, class group or meetup whose admin you can reach. It stays in the directory for future events.</p>
+    <div class="form-grid">
+      <div><label class="field-label" for="cm-name">Group name</label>
+        <input class="field" id="cm-name" name="name" required minlength="3" maxlength="120" autocomplete="off" placeholder="XYZ College Coding Club" />
+        <span class="field-error" data-error-for="name"></span></div>
+      <div class="form-grid two">
+        <div><label class="field-label" for="cm-city">City</label>
+          <input class="field" id="cm-city" name="city" required minlength="2" maxlength="60" autocomplete="off" placeholder="Pune, or Online" />
+          <span class="field-error" data-error-for="city"></span></div>
+        <div><label class="field-label" for="cm-platform">Where they talk</label>
+          <select class="field" id="cm-platform" name="platform"><option value="whatsapp">WhatsApp</option><option value="telegram">Telegram</option><option value="instagram">Instagram</option><option value="discord">Discord</option><option value="other">Other</option></select></div>
+      </div>
+      <div class="form-grid two">
+        <div><label class="field-label" for="cm-size">Approximate members</label>
+          <input class="field" id="cm-size" name="size" type="number" inputmode="numeric" min="1" max="10000000" step="1" value="150" required />
+          <span class="field-error" data-error-for="size"></span></div>
+        <div><label class="field-label" for="cm-admin">Admin's first name <span class="muted">(optional)</span></label>
+          <input class="field" id="cm-admin" name="admin_name" maxlength="60" autocomplete="off" />
+          <span class="field-error" data-error-for="admin_name"></span></div>
+      </div>
+      <div><label class="field-label" for="cm-tags">Topics they care about</label>
+        <input class="field" id="cm-tags" name="tags" maxlength="300" autocomplete="off" placeholder="ai, hackathon, beginner" />
+        <span class="field-error" data-error-for="tags"></span></div>
+      <fieldset class="form-grid"><legend class="field-label">Languages the admin reads</legend>
+        <div class="row">
+          <label class="check-chip"><input type="checkbox" name="lang" value="en" checked /><span>English</span></label>
+          <label class="check-chip"><input type="checkbox" name="lang" value="hi" /><span>Hindi</span></label>
+          <label class="check-chip"><input type="checkbox" name="lang" value="mr" /><span>Marathi</span></label>
+        </div>
+        <span class="field-error" data-error-for="languages"></span>
+      </fieldset>
+    </div>
+    <div class="form-error hidden" role="alert"></div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+      <button type="submit" class="btn btn-primary">Add group</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Walk-in -->
+<dialog id="dlg-walkin" aria-labelledby="dlg-walkin-title">
+  <form class="dialog-card narrow" id="form-walkin" novalidate>
+    <h2 id="dlg-walkin-title">Add a walk-in</h2>
+    <p class="intro">For someone registering in person. They're seated by the same rules as the bot.</p>
+    <div class="form-grid">
+      <div><label class="field-label" for="wi-name">Name</label>
+        <input class="field" id="wi-name" name="name" required maxlength="80" autocomplete="off" />
+        <span class="field-error" data-error-for="name"></span></div>
+      <fieldset class="form-grid"><legend class="field-label">Role</legend>
+        <div class="row" id="walkin-roles"></div></fieldset>
+      <div><label class="field-label" for="wi-exp">Hackathon experience</label>
+        <select class="field" id="wi-exp" name="experience"><option value="first_time">This is their first</option><option value="some">1–2 before</option><option value="veteran">3 or more</option></select></div>
+    </div>
+    <div class="form-error hidden" role="alert"></div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+      <button type="submit" class="btn btn-primary">Seat them</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Decline a request -->
+<dialog id="dlg-decline" aria-labelledby="dlg-decline-title">
+  <form class="dialog-card narrow" id="form-decline" novalidate>
+    <h2 id="dlg-decline-title">Decline request</h2>
+    <p class="intro">The host sees this note on their tracking page. Keep it short and kind.</p>
+    <label class="field-label" for="decline-note">Note to the host <span class="muted">(optional)</span></label>
+    <textarea class="field" id="decline-note" name="note" rows="3" maxlength="500" placeholder="Our team is fully booked on that date."></textarea>
+    <span class="field-error" data-error-for="note"></span>
+    <div class="form-error hidden" role="alert"></div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+      <button type="submit" class="btn btn-primary">Decline request</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+</body>
+</html>

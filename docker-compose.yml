@@ -1,0 +1,33 @@
+# Production-style setup: docker compose up -d --build
+# Put a TLS-terminating reverse proxy (Caddy, Nginx, your platform's load balancer) in front of port 8000.
+services:
+  api:
+    build: .
+    env_file: .env
+    ports:
+      - "127.0.0.1:8000:8000"   # only reachable through your reverse proxy
+    volumes:
+      - radar-data:/data
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+
+  bot:
+    build: .
+    command: ["python", "-m", "bot.telegram_bot"]
+    env_file: .env
+    environment:
+      RADAR_API_URL: http://api:8000
+    volumes:
+      - radar-data:/data
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+
+volumes:
+  radar-data:

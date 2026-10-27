@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Submit your event · Radar + SquadUp</title>
+<meta name="description" content="Tell us about your hackathon, olympiad, science fair or fest. We find the student groups most likely to care and handle sign-ups and teams in Telegram." />
+<meta name="theme-color" content="#F4EFE4" />
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" />
+<link rel="stylesheet" href="/assets/site.css" />
+<script src="/assets/submit.js" defer></script>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" />Radar <em>&amp;</em> SquadUp</a>
+  <div class="nav-links">
+    <a class="hide-sm" href="/#how">How it works</a>
+    <a href="/track/">Track a request</a>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="wrap page-grid">
+    <div class="intro-col">
+      <p class="kicker"><span class="dot" aria-hidden="true"></span>For event hosts</p>
+      <h1 class="display display-lg">Tell us about <em>your event.</em></h1>
+      <p class="lede">We'll find the student clubs and groups most likely to care, write to their admins in the right language, and handle sign-ups and teams inside Telegram.</p>
+      <ol class="next-steps">
+        <li><span class="roman">i</span><div><h3>You send this form</h3><p>You get a reference and a private link to follow progress.</p></div></li>
+        <li><span class="roman">ii</span><div><h3>We review it</h3><p>We check the details and reply by email if anything is unclear.</p></div></li>
+        <li><span class="roman">iii</span><div><h3>We run the reach</h3><p>Radar finds the right groups; we approve every message before it goes to an admin.</p></div></li>
+        <li><span class="roman">iv</span><div><h3>You watch sign-ups arrive</h3><p>Your private link shows groups contacted, registrations and full teams.</p></div></li>
+      </ol>
+    </div>
+
+    <div>
+      <form class="form-card" id="request-form" novalidate>
+        <fieldset class="form-grid">
+          <legend>About you</legend>
+          <div class="form-grid two">
+            <div><label class="field-label" for="contact_name">Your name</label>
+              <input class="field" id="contact_name" name="contact_name" required minlength="2" maxlength="80" autocomplete="name" />
+              <span class="field-error" data-error-for="contact_name"></span></div>
+            <div><label class="field-label" for="organisation">College, club or organisation</label>
+              <input class="field" id="organisation" name="organisation" required minlength="2" maxlength="120" autocomplete="organization" />
+              <span class="field-error" data-error-for="organisation"></span></div>
+          </div>
+          <div class="form-grid two">
+            <div><label class="field-label" for="contact_email">Email</label>
+              <input class="field" id="contact_email" name="contact_email" type="email" required maxlength="254" autocomplete="email" inputmode="email" />
+              <span class="field-error" data-error-for="contact_email"></span></div>
+            <div><label class="field-label" for="contact_phone">Phone <span class="muted">(optional)</span></label>
+              <input class="field" id="contact_phone" name="contact_phone" type="tel" maxlength="20" autocomplete="tel" inputmode="tel" placeholder="+91 98765 43210" />
+              <span class="field-error" data-error-for="contact_phone"></span></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-grid">
+          <legend>About the event</legend>
+          <div><label class="field-label" for="event_name">Event name</label>
+            <input class="field" id="event_name" name="event_name" required minlength="3" maxlength="120" autocomplete="off" placeholder="Sonipat Robotics Olympiad" />
+            <span class="field-error" data-error-for="event_name"></span></div>
+          <div class="form-grid two">
+            <div><label class="field-label" for="city">City</label>
+              <input class="field" id="city" name="city" required minlength="2" maxlength="60" autocomplete="address-level2" placeholder="Pune" />
+              <span class="field-error" data-error-for="city"></span></div>
+            <div><label class="field-label" for="start_date">Date</label>
+              <input class="field" id="start_date" name="start_date" type="date" required />
+              <span class="field-error" data-error-for="start_date"></span></div>
+          </div>
+          <div class="form-grid two">
+            <div><label class="field-label" for="venue">Venue <span class="muted">(optional)</span></label>
+              <input class="field" id="venue" name="venue" maxlength="160" autocomplete="off" />
+              <span class="field-error" data-error-for="venue"></span></div>
+            <div><label class="field-label" for="expected_participants">Expected participants <span class="muted">(optional)</span></label>
+              <input class="field" id="expected_participants" name="expected_participants" type="number" inputmode="numeric" min="10" max="100000" step="1" placeholder="100" />
+              <span class="field-error" data-error-for="expected_participants"></span></div>
+          </div>
+          <div><label class="field-label" for="description">What happens at the event</label>
+            <textarea class="field" id="description" name="description" rows="4" required minlength="20" maxlength="2000" placeholder="A 24-hour beginner-friendly hackathon where students build tools for local problems. Mentors on site, teams of four."></textarea>
+            <span class="field-hint">The first sentence goes into every message we send to group admins, so make it count.</span>
+            <span class="field-error" data-error-for="description"></span></div>
+          <fieldset class="form-grid"><legend class="field-label">Topics</legend>
+            <div class="row" id="tag-picker"></div>
+            <input class="field" name="extra_tags" maxlength="200" autocomplete="off" placeholder="Other topics, separated by commas" />
+            <span class="field-error" data-error-for="tags"></span>
+          </fieldset>
+        </fieldset>
+
+        <div class="hp" aria-hidden="true">
+          <label for="website">Leave this empty</label>
+          <input id="website" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <label class="consent"><input type="checkbox" name="consent" required />
+          <span>I'm organising this event, and I agree to be contacted about it by email or phone. We only use your details for this event.</span></label>
+        <span class="field-error" data-error-for="consent"></span>
+
+        <div class="form-error hidden" role="alert"></div>
+        <div class="form-foot">
+          <small>Takes about two minutes.</small>
+          <button class="btn btn-primary" type="submit">Submit event <span class="arrow" aria-hidden="true">→</span></button>
+        </div>
+      </form>
+
+      <section class="form-card hidden" id="request-done" aria-live="polite" tabindex="-1">
+        <p class="kicker"><span class="dot" aria-hidden="true"></span>Request received</p>
+        <div class="success-ref" id="done-ref"></div>
+        <p class="muted">Keep this reference for any emails with us.</p>
+        <h2 class="display display-md">Save your <em>private link.</em></h2>
+        <p>It shows the progress of your event: groups contacted, sign-ups and full teams. Anyone with the link can see these numbers, and we can't send it again, so keep it somewhere safe.</p>
+        <div class="track-link"><code id="done-link"></code><button class="btn btn-primary btn-sm" type="button" id="copy-link">Copy link</button></div>
+        <div class="hero-actions"><a class="btn btn-outline" id="open-link" href="/track/">Open it now</a></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" />Radar <em>&amp;</em> SquadUp</a>
+    <span>Your details are only used to organise this event.</span>
+    <nav aria-label="Footer"><a href="/">Home</a><a href="/track/">Track a request</a><a href="/app/">Team sign-in</a></nav>
+  </div>
+</footer>
+</body>
+</html>

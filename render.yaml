@@ -1,0 +1,44 @@
+# One-click hosting on Render (https://render.com): New → Blueprint → pick this repository.
+# Render generates ADMIN_TOKEN and BOT_API_KEY for you; find them under the service's Environment tab.
+#
+# FREE PLAN (default below) is fine for demos, but Render's free web services sleep after 15 idle minutes
+# and lose local files when they do, including the SQLite database. Sample data reloads on every start.
+#
+# FOR REAL USE switch to a paid instance with a persistent disk: set `plan: starter`, uncomment the `disk`
+# block, and set RADAR_DB_PATH to /var/data/radar.db. Then SEED_DEMO_EVENT and ENABLE_SIMULATOR can go to "false".
+services:
+  - type: web
+    name: radar-squadup
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips "*" --no-server-header
+    healthCheckPath: /api/health
+    autoDeploy: true
+    # disk:
+    #   name: radar-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: APP_ENV
+        value: production
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: BOT_API_KEY
+        generateValue: true
+      - key: TELEGRAM_BOT_USERNAME
+        value: RadarSquadUpBot          # change to your bot's username from @BotFather
+      - key: TRUST_PROXY
+        value: "true"
+      - key: RADAR_DB_PATH
+        value: ./radar.db               # /var/data/radar.db once the disk is enabled
+      - key: SEED_DIRECTORY
+        value: "true"                   # loads the sample directory of community groups
+      - key: SEED_DEMO_EVENT
+        value: "true"
+      - key: ENABLE_SIMULATOR
+        value: "true"                   # "Add sample sign-ups" button, for demos
+      - key: ENABLE_DOCS
+        value: "false"
