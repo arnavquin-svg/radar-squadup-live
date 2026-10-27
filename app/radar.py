@@ -222,7 +222,7 @@ TEMPLATES: dict[str, dict[str, str]] = {
         "interests_fallback": "student events in {city}",
         "what": "What it is: {summary}",
         "beginner": "First-timers are welcome — no prior experience needed.",
-        "how": "Registration takes under a minute inside Telegram, and solo participants are matched "
+        "how": "Registration takes under a minute on the web, and solo participants are matched "
                "into balanced teams of {team_size}.",
         "ask": "If you think it fits, would you be open to forwarding this to your group? Link: {link}",
         "close": "No pressure at all — thanks for reading!",
@@ -237,7 +237,7 @@ TEMPLATES: dict[str, dict[str, str]] = {
         "interests_fallback": "{city} के छात्र आयोजनों",
         "what": "क्या है: {summary}",
         "beginner": "पहली बार भाग लेने वालों का भी स्वागत है — पहले अनुभव की ज़रूरत नहीं।",
-        "how": "Telegram पर रजिस्ट्रेशन एक मिनट से भी कम में हो जाता है, और अकेले आने वालों को "
+        "how": "वेब चैट पर रजिस्ट्रेशन एक मिनट से भी कम में हो जाता है, और अकेले आने वालों को "
                "{team_size} लोगों की संतुलित टीम में जोड़ा जाता है।",
         "ask": "अगर आपको ठीक लगे, तो क्या आप इसे अपने ग्रुप में फ़ॉरवर्ड कर सकते हैं? लिंक: {link}",
         "close": "कोई दबाव नहीं — पढ़ने के लिए धन्यवाद!",
@@ -252,7 +252,7 @@ TEMPLATES: dict[str, dict[str, str]] = {
         "interests_fallback": "{city} मधील विद्यार्थी उपक्रमां",
         "what": "काय आहे: {summary}",
         "beginner": "पहिल्यांदाच सहभागी होणाऱ्यांचेही स्वागत आहे — आधीच्या अनुभवाची गरज नाही.",
-        "how": "Telegram वर नोंदणी एका मिनिटापेक्षा कमी वेळात होते, आणि एकट्याने येणाऱ्यांना "
+        "how": "वेब चॅटवर नोंदणी एका मिनिटापेक्षा कमी वेळात होते, आणि एकट्याने येणाऱ्यांना "
                "{team_size} जणांच्या संतुलित टीममध्ये जोडलं जातं.",
         "ask": "तुम्हाला योग्य वाटल्यास, हे तुमच्या ग्रुपमध्ये फॉरवर्ड कराल का? लिंक: {link}",
         "close": "कोणताही दबाव नाही — वाचल्याबद्दल धन्यवाद!",

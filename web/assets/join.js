@@ -7,7 +7,7 @@
   if (!/^(o|r|e)_[A-Za-z0-9]{1,40}$/.test(payload)) payload = '';
   let eventId = null, role = '', name = '', experience = '';
   const chat = $('#chat');
-  const bubble = (text, who='bot') => { const el=document.createElement('div');el.className=`bubble ${who}`;el.textContent=text;chat.append(el);el.scrollIntoView({block:'nearest',behavior:'smooth'}); };
+  const bubble = (text, who='assistant') => { const el=document.createElement('div');el.className=`bubble ${who}`;el.textContent=text;chat.append(el);el.scrollIntoView({block:'nearest',behavior:'smooth'}); };
   const fail = (message) => { $('#error').textContent=message; };
   const api = async (url, options={}) => { const response=await fetch(url,{...options,cache:'no-store',headers:{Accept:'application/json',...(options.body?{'Content-Type':'application/json'}:{}),...options.headers}}); const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.detail||'Something went wrong. Please try again.');return data; };
   async function init(){

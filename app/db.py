@@ -76,7 +76,6 @@ CREATE TABLE IF NOT EXISTS participants (
     id                 INTEGER PRIMARY KEY AUTOINCREMENT,
     event_id           INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
     name               TEXT    NOT NULL,
-    telegram_id        INTEGER,
     language           TEXT    NOT NULL DEFAULT 'en',
     role               TEXT    NOT NULL
                                CHECK (role IN ('developer', 'designer', 'domain_expert', 'presenter')),
@@ -90,8 +89,7 @@ CREATE TABLE IF NOT EXISTS participants (
     is_synthetic       INTEGER NOT NULL DEFAULT 0,
     status             TEXT    NOT NULL DEFAULT 'registered'
                                CHECK (status IN ('registered', 'confirmed', 'withdrawn')),
-    created_at         TEXT    NOT NULL DEFAULT (datetime('now')),
-    UNIQUE (event_id, telegram_id)
+    created_at         TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
 -- v2: requests from event hosts, submitted through the public website

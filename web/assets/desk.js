@@ -372,7 +372,7 @@
       return `<li class="row"><span class="avatar role-${esc(p.role)}">${esc(p.first_name.slice(0, 1).toUpperCase())}</span>
         <span class="grow"><span class="truncate">${esc(p.name)} <span class="muted">${esc(ROLE[p.role]?.label || '')}${p.team_number ? `, Team ${p.team_number}` : ''}</span></span>
         <span class="muted truncate">${source}, ${esc(ago(p.created_at))}</span></span>${tag}</li>`;
-    }).join('') : '<li class="empty">Nobody yet. Once an approved link is shared, people register in Telegram and show up here.</li>';
+    }).join('') : '<li class="empty">Nobody yet. Once an approved link is shared, people register through the web chat and show up here.</li>';
     applyBars($('#view-overview'));
   }
 
@@ -606,7 +606,7 @@
   function renderTeams() {
     const box = $('#teams');
     if (!state.teams.length) {
-      box.innerHTML = '<p class="empty">No squads yet. They form as people register through the Telegram bot or as walk-ins.</p>';
+      box.innerHTML = '<p class="empty">No squads yet. They form as people register through the web chat or as walk-ins.</p>';
       return;
     }
     box.innerHTML = state.teams.map(t => {

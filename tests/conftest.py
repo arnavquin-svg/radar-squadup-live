@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 ADMIN = "test-admin-token-0123456789abcdefghijkl"
-BOT = "test-bot-key-0123456789abcdefghijklmnopq"
+SERVICE = "test-service-key-0123456789abcdefghijkl"
 
 
 @pytest.fixture()
@@ -15,12 +15,11 @@ def make_client(tmp_path, monkeypatch):
         base = {
             "APP_ENV": "test",
             "ADMIN_TOKEN": ADMIN,
-            "BOT_API_KEY": BOT,
+            "SERVICE_API_KEY": SERVICE,
             "RADAR_DB_PATH": str(tmp_path / "test.db"),
             "SEED_DIRECTORY": "1",
             "SEED_DEMO_EVENT": "0",
             "ENABLE_SIMULATOR": "1",
-            "TELEGRAM_BOT_USERNAME": "RadarSquadUpBot",
         }
         base.update(env)
         for key, value in base.items():
@@ -45,5 +44,5 @@ def client(make_client):
 
 
 @pytest.fixture()
-def bot_headers():
-    return {"X-Service-Key": BOT}
+def service_headers():
+    return {"X-Service-Key": SERVICE}

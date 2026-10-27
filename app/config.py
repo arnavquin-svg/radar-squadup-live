@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import logging
 import os
-import re
 import secrets
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -16,7 +15,6 @@ from pathlib import Path
 log = logging.getLogger("radar.config")
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "radar.db"
-BOT_USERNAME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]{4,31}$")
 MIN_SECRET_LENGTH = 32
 
 
@@ -57,8 +55,7 @@ def _csv(name: str) -> tuple[str, ...]:
 class Settings:
     env: str
     admin_token: str
-    bot_api_key: str
-    bot_username: str
+    service_api_key: str
     db_path: str
     cors_origins: tuple[str, ...] = field(default_factory=tuple)
     trusted_hosts: tuple[str, ...] = field(default_factory=tuple)
@@ -84,34 +81,29 @@ def load_settings() -> Settings:
     prod = env == "production"
 
     admin_token = os.getenv("ADMIN_TOKEN", "").strip()
-    bot_api_key = os.getenv("BOT_API_KEY", "").strip()
+    service_api_key = os.getenv("SERVICE_API_KEY", "").strip()
     generated = False
     if prod:
-        for name, value in (("ADMIN_TOKEN", admin_token), ("BOT_API_KEY", bot_api_key)):
+        for name, value in (("ADMIN_TOKEN", admin_token), ("SERVICE_API_KEY", service_api_key)):
             if len(value) < MIN_SECRET_LENGTH:
                 raise ConfigError(
                     f"{name} must be set to a random value of at least {MIN_SECRET_LENGTH} characters in "
                     "production. Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(32))\""
                 )
-        if admin_token == bot_api_key:
-            raise ConfigError("ADMIN_TOKEN and BOT_API_KEY must be different")
+        if admin_token == service_api_key:
+            raise ConfigError("ADMIN_TOKEN and SERVICE_API_KEY must be different")
     else:
         if not admin_token:
             admin_token = secrets.token_urlsafe(24)
             generated = True
-        if not bot_api_key:
-            bot_api_key = secrets.token_urlsafe(24)
+        if not service_api_key:
+            service_api_key = secrets.token_urlsafe(24)
             generated = True
-
-    bot_username = os.getenv("TELEGRAM_BOT_USERNAME", "" if prod else "RadarSquadUpBot").strip().lstrip("@")
-    if not BOT_USERNAME_RE.match(bot_username):
-        raise ConfigError("TELEGRAM_BOT_USERNAME must be your bot's username (5-32 letters, digits or _)")
 
     settings = Settings(
         env=env,
         admin_token=admin_token,
-        bot_api_key=bot_api_key,
-        bot_username=bot_username,
+        service_api_key=service_api_key,
         db_path=os.getenv("RADAR_DB_PATH", str(DEFAULT_DB_PATH)),
         cors_origins=_csv("CORS_ORIGINS"),
         trusted_hosts=_csv("TRUSTED_HOSTS"),

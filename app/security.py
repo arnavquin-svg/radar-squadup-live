@@ -3,7 +3,7 @@
 Two credentials exist:
   * ADMIN_TOKEN  - the organiser's access key, sent as `Authorization: Bearer <token>`
                    by the organiser desk. Grants everything.
-  * BOT_API_KEY  - the Telegram bot's service key, sent as `X-Service-Key`.
+  * SERVICE_API_KEY - the internal service key, sent as `X-Service-Key`.
                    Grants only the participant-facing endpoints.
 """
 from __future__ import annotations
@@ -103,7 +103,7 @@ def is_admin(request: Request) -> bool:
 
 
 def is_service(request: Request) -> bool:
-    return _matches(request.headers.get("x-service-key"), get_settings().bot_api_key)
+    return _matches(request.headers.get("x-service-key"), get_settings().service_api_key)
 
 
 def _reject(request: Request) -> None:
@@ -131,7 +131,7 @@ def require_admin(request: Request) -> None:
 
 
 def require_service(request: Request) -> None:
-    """Dependency: the bot's service key, or the organiser's access key."""
+    """Dependency: the internal service key, or the organiser's access key."""
     _guard_blocked(request)
     if not (is_service(request) or is_admin(request)):
         _reject(request)
@@ -141,7 +141,7 @@ def require_service(request: Request) -> None:
 # Middleware
 # --------------------------------------------------------------------------- #
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    """Per-IP request budget for /api. The bot proxies many users from one IP, so it gets a larger budget."""
+    """Per-IP request budget for /api. Internal services can proxy users from one IP, so authenticated service calls get a larger budget."""
 
     async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         path = request.url.path

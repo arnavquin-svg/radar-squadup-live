@@ -29,7 +29,6 @@ from .config import Settings, get_settings
 from .db import connect, dumps, init_db, row_to_dict, rows_to_dicts
 from .schemas import (
     MAX_ID,
-    MAX_TELEGRAM_ID,
     PAYLOAD_RE,
     CommunityCreate,
     EventCreate,
@@ -130,7 +129,7 @@ def get_outreach_or_404(conn: sqlite3.Connection, outreach_id: int) -> dict[str,
 
 
 def resolve_payload(conn: sqlite3.Connection, payload: Optional[str]) -> dict[str, Any]:
-    """Turn a Telegram /start payload into attribution: community link, referral, or direct."""
+    """Resolve a tracked web join link to its event and attribution."""
     payload = (payload or "").strip()
     if payload and not PAYLOAD_RE.match(payload):
         payload = ""
@@ -216,7 +215,7 @@ def participant_view(conn: sqlite3.Connection, participant_id: int) -> dict[str,
 
 def register_participant(conn: sqlite3.Connection, body: RegistrationCreate,
                          synthetic: bool = False) -> tuple[dict[str, Any], bool]:
-    """Core registration used by the API, the bot and the simulator. Returns (participant, created)."""
+    """Core registration used by the web flow, API and simulator."""
     attribution = resolve_payload(conn, body.ref_payload) if body.ref_payload or not body.event_id else None
     if body.event_id:
         event = get_event_or_404(conn, body.event_id)
@@ -225,23 +224,6 @@ def register_participant(conn: sqlite3.Connection, body: RegistrationCreate,
     else:
         event = attribution["event"]  # type: ignore[index]
 
-    if body.telegram_id is not None:
-        existing = conn.execute(
-            "SELECT id, status FROM participants WHERE event_id = ? AND telegram_id = ?",
-            (event["id"], body.telegram_id),
-        ).fetchone()
-        if existing:
-            if existing["status"] == "withdrawn":
-                # Coming back after withdrawing: re-run matching with their (possibly new) role.
-                team_id, _ = squad.assign_team(conn, event["id"], body.role, event["team_size"])
-                conn.execute(
-                    """UPDATE participants SET status = 'registered', role = ?, experience = ?, language = ?,
-                       team_id = ? WHERE id = ?""",
-                    (body.role, body.experience, body.language, team_id, existing["id"]),
-                )
-                return participant_view(conn, existing["id"]), True
-            return participant_view(conn, existing["id"]), False
-
     outreach_id = attribution["outreach_id"] if attribution and attribution["kind"] == "community" else None
     referrer_id = (attribution["referrer"]["id"]
                    if attribution and attribution["kind"] == "referral" and attribution["referrer"]["active"]
@@ -249,10 +231,10 @@ def register_participant(conn: sqlite3.Connection, body: RegistrationCreate,
 
     team_id, _reason = squad.assign_team(conn, event["id"], body.role, event["team_size"], referrer_id)
     cur = conn.execute(
-        """INSERT INTO participants (event_id, name, telegram_id, language, role, experience,
+        """INSERT INTO participants (event_id, name, language, role, experience,
                                      source_outreach_id, referrer_id, team_id, invite_code, college, is_synthetic)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (event["id"], body.name.strip(), body.telegram_id, body.language, body.role, body.experience,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (event["id"], body.name.strip(), body.language, body.role, body.experience,
          outreach_id, referrer_id, team_id, squad.new_invite_code(), body.college.strip(), int(synthetic)),
     )
     if body.college:
@@ -274,7 +256,6 @@ def health() -> dict[str, Any]:
 def config() -> dict[str, Any]:
     settings = get_settings()
     return {
-        "bot_username": settings.bot_username,
         "environment": settings.env,
         "simulator_enabled": settings.enable_simulator,
         "roles": [{"id": r, "label": squad.ROLE_LABELS[r]} for r in squad.ROLES],
@@ -582,23 +563,6 @@ def register(body: RegistrationCreate) -> dict[str, Any]:
     return participant
 
 
-@service.get("/participants/lookup", tags=["squadup"])
-def lookup_participant(telegram_id: int = Query(..., gt=0, le=MAX_TELEGRAM_ID),
-                       event_id: Optional[int] = Query(None, gt=0, le=MAX_ID)) -> dict[str, Any]:
-    with connect() as conn:
-        if event_id:
-            row = conn.execute(
-                "SELECT id FROM participants WHERE telegram_id = ? AND event_id = ?", (telegram_id, event_id)
-            ).fetchone()
-        else:
-            row = conn.execute(
-                "SELECT id FROM participants WHERE telegram_id = ? ORDER BY id DESC LIMIT 1", (telegram_id,)
-            ).fetchone()
-        if not row:
-            raise HTTPException(404, "Not registered")
-        return participant_view(conn, row["id"])
-
-
 @service.get("/participants/{participant_id}", tags=["squadup"])
 def get_participant(participant_id: Id) -> dict[str, Any]:
     with connect() as conn:
@@ -652,21 +616,6 @@ def get_team_card(team_id: Id) -> dict[str, Any]:
     if not card:
         raise HTTPException(404, f"Team {team_id} not found")
     return card
-
-
-@service.get("/reminders", tags=["squadup"])
-def reminder_targets(event_id: Optional[int] = Query(None, gt=0, le=MAX_ID)) -> list[dict[str, Any]]:
-    """Everyone the bot should nudge: Telegram users who haven't withdrawn."""
-    sql = """SELECT p.id AS participant_id, p.telegram_id, p.language, p.name, p.status, p.event_id,
-                    e.name AS event_name, e.start_date, t.number AS team_number
-             FROM participants p JOIN events e ON e.id = p.event_id LEFT JOIN teams t ON t.id = p.team_id
-             WHERE p.telegram_id IS NOT NULL AND p.status != 'withdrawn'"""
-    params: tuple = ()
-    if event_id:
-        sql += " AND p.event_id = ?"
-        params = (event_id,)
-    with connect() as conn:
-        return [dict(r) for r in conn.execute(sql, params).fetchall()]
 
 
 # --------------------------------------------------------------------------- #
@@ -1009,7 +958,7 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
         if settings.generated_secrets:
             log.warning("ADMIN_TOKEN was not set, so a temporary one was generated for this run.")
             log.warning("Organiser access key for this run: %s", settings.admin_token)
-            log.warning("Set ADMIN_TOKEN and BOT_API_KEY in .env to keep them stable between restarts.")
+            log.warning("Set ADMIN_TOKEN and SERVICE_API_KEY in .env to keep them stable between restarts.")
         log.info("RadiUp.ai started in %s mode", settings.env)
         yield
 

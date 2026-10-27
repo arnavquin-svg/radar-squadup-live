@@ -1,4 +1,4 @@
-# One image for both services: the API (default command) and the bot (override the command).
+# API and browser-based registration service.
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -6,8 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     APP_ENV=production \
-    RADAR_DB_PATH=/data/radar.db \
-    BOT_PERSISTENCE_FILE=/data/bot_state.pickle
+    RADAR_DB_PATH=/data/radar.db
 
 WORKDIR /srv
 RUN useradd --create-home --uid 10001 radar && mkdir -p /data && chown radar:radar /data
@@ -16,7 +15,6 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY app ./app
-COPY bot ./bot
 COPY web ./web
 
 USER radar

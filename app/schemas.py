@@ -20,7 +20,6 @@ Language = Literal["en", "hi", "mr"]
 Platform = Literal["whatsapp", "telegram", "instagram", "discord", "other"]
 
 MAX_ID = 2_147_483_647
-MAX_TELEGRAM_ID = 2**53 - 1
 PAYLOAD_RE = re.compile(r"^(o|r|e)_[A-Za-z0-9]{1,40}$")
 TAG_RE = re.compile(r"^[a-z0-9][a-z0-9 \-]{0,29}$")
 # C0/C1 controls, zero-width characters and bidirectional overrides (used for spoofing).
@@ -160,7 +159,6 @@ class RegistrationCreate(StrictModel):
     role: Role
     experience: Experience = "first_time"
     language: Language = "en"
-    telegram_id: Optional[int] = Field(default=None, gt=0, le=MAX_TELEGRAM_ID)
     ref_payload: Optional[Payload] = None
     college: Line(0, 120) = ""
 

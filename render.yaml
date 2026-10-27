@@ -1,5 +1,5 @@
 # One-click hosting on Render (https://render.com): New → Blueprint → pick this repository.
-# Render generates ADMIN_TOKEN and BOT_API_KEY for you; find them under the service's Environment tab.
+# Render generates ADMIN_TOKEN and SERVICE_API_KEY for you; find them under the service's Environment tab.
 #
 # FREE PLAN (default below) is fine for demos, but Render's free web services sleep after 15 idle minutes
 # and lose local files when they do, including the SQLite database. Sample data reloads on every start.
@@ -26,10 +26,8 @@ services:
         value: production
       - key: ADMIN_TOKEN
         generateValue: true
-      - key: BOT_API_KEY
+      - key: SERVICE_API_KEY
         generateValue: true
-      - key: TELEGRAM_BOT_USERNAME
-        value: RadarSquadUpBot          # change to your bot's username from @BotFather
       - key: TRUST_PROXY
         value: "true"
       - key: RADAR_DB_PATH

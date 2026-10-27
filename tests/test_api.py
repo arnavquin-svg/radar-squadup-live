@@ -71,27 +71,21 @@ def test_team_balancing_and_referrals(client):
     payload = f"o_{o['ref_code']}"
 
     roles = ["developer", "designer", "domain_expert", "presenter"]
-    people = [client.post("/api/register", json={"name": f"P{i}", "role": r, "ref_payload": payload,
-                                                  "telegram_id": 1000 + i}).json()
+    people = [client.post("/api/register", json={"name": f"P{i}", "role": r, "ref_payload": payload}).json()
               for i, r in enumerate(roles)]
     assert len({p["team_id"] for p in people}) == 1
     assert people[-1]["team"]["is_full"]
 
     # A second developer must not join a dev-heavy team when a balanced option is missing.
-    d2 = client.post("/api/register", json={"name": "Dev Two", "role": "developer", "telegram_id": 2001,
+    d2 = client.post("/api/register", json={"name": "Dev Two", "role": "developer",
                                             "ref_payload": payload}).json()
     assert d2["team_id"] != people[0]["team_id"]
     assert d2["source_outreach_id"] == o["id"]
 
     # Referral gets priority placement into the referrer's team, even with a duplicate role.
-    friend = client.post("/api/register", json={"name": "Friend", "role": "developer", "telegram_id": 2002,
+    friend = client.post("/api/register", json={"name": "Friend", "role": "developer",
                                                 "ref_payload": f"r_{d2['invite_code']}"}).json()
     assert friend["team_id"] == d2["team_id"] and friend["referrer_id"] == d2["id"]
-
-    # Idempotent re-registration
-    again = client.post("/api/register", json={"name": "Dev Two", "role": "developer", "telegram_id": 2001,
-                                               "event_id": ev["id"]}).json()
-    assert again["id"] == d2["id"] and again["created"] is False
 
     card = client.get(f"/api/teams/{d2['team_id']}/card").json()
     assert card["filled"] == 2 and "designer" in card["label"]

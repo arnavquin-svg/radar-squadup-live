@@ -5,7 +5,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from tests.conftest import ADMIN, BOT
+from tests.conftest import ADMIN, SERVICE
 
 
 def future(days: int = 30) -> str:
@@ -26,16 +26,20 @@ def test_admin_routes_need_the_access_key(make_client, method, path):
     with make_client() as c:
         assert getattr(c, method)(path).status_code == 401
         assert getattr(c, method)(path, headers={"Authorization": "Bearer wrong"}).status_code == 401
-        # The bot's key must not unlock organiser routes.
-        assert getattr(c, method)(path, headers={"X-Service-Key": BOT}).status_code == 401
+        # The service key must not unlock organiser routes.
+        assert getattr(c, method)(path, headers={"X-Service-Key": SERVICE}).status_code == 401
 
 
-def test_service_routes_accept_bot_key_or_admin(make_client):
+def test_service_routes_accept_service_key_or_admin(make_client):
     with make_client() as c:
-        c.post("/api/events", json={"name": "Hack Night", "city": "Pune"}, headers={"Authorization": f"Bearer {ADMIN}"})
-        assert c.get("/api/reminders").status_code == 401
-        assert c.get("/api/reminders", headers={"X-Service-Key": BOT}).status_code == 200
-        assert c.get("/api/reminders", headers={"Authorization": f"Bearer {ADMIN}"}).status_code == 200
+        event = c.post("/api/events", json={"name": "Hack Night", "city": "Pune"},
+                       headers={"Authorization": f"Bearer {ADMIN}"}).json()
+        body = {"event_id": event["id"], "name": "Riya", "role": "designer"}
+        assert c.post("/api/register", json=body).status_code == 401
+        registered = c.post("/api/register", json=body, headers={"X-Service-Key": SERVICE})
+        assert registered.status_code == 200
+        assert c.get(f"/api/participants/{registered.json()['id']}",
+                     headers={"Authorization": f"Bearer {ADMIN}"}).status_code == 200
 
 
 def test_repeated_bad_keys_get_blocked(make_client):
@@ -75,24 +79,24 @@ def test_text_is_cleaned(client):
     assert r.status_code == 201 and r.json()["name"] == "Hack Night"
 
 
-def test_hindi_names_are_allowed(client, bot_headers):
+def test_hindi_names_are_allowed(client, service_headers):
     ev = client.post("/api/events", json={"name": "Hack Night", "city": "Pune"}).json()
-    r = client.post("/api/register", headers=bot_headers,
-                    json={"event_id": ev["id"], "name": "मीरा शर्मा", "role": "designer", "telegram_id": 5})
+    r = client.post("/api/register", headers=service_headers,
+                    json={"event_id": ev["id"], "name": "मीरा शर्मा", "role": "designer"})
     assert r.status_code == 200 and r.json()["name"] == "मीरा शर्मा"
 
 
 @pytest.mark.parametrize("body", [
     {"name": "A", "role": "hacker"},
-    {"name": "A", "role": "developer", "telegram_id": -1},
+    {"name": "A", "role": "developer", "experience": "too-many"},
     {"name": "A", "role": "developer", "ref_payload": "o_'; DROP--"},
     {"name": "", "role": "developer"},
     {"name": "A", "role": "developer", "language": "fr"},
 ])
-def test_registration_validation(client, bot_headers, body):
+def test_registration_validation(client, service_headers, body):
     ev = client.post("/api/events", json={"name": "Hack Night", "city": "Pune"}).json()
     body = {"event_id": ev["id"], **body}
-    assert client.post("/api/register", json=body, headers=bot_headers).status_code == 422
+    assert client.post("/api/register", json=body, headers=service_headers).status_code == 422
 
 
 def test_path_and_query_validation(client):
@@ -129,7 +133,7 @@ def test_security_headers(make_client):
 
 def test_no_inline_scripts_or_styles_in_pages(make_client):
     with make_client() as c:
-        for path in ("/", "/app/", "/submit/", "/track/"):
+        for path in ("/", "/app/", "/submit/", "/track/", "/join/"):
             html = c.get(path).text
             assert "<script>" not in html and "style=" not in html and "<style" not in html, path
 
@@ -145,14 +149,13 @@ def test_production_refuses_weak_config(monkeypatch, tmp_path):
     from app.config import ConfigError, load_settings
     monkeypatch.setenv("APP_ENV", "production")
     monkeypatch.setenv("RADAR_DB_PATH", str(tmp_path / "p.db"))
-    monkeypatch.setenv("TELEGRAM_BOT_USERNAME", "RadarSquadUpBot")
     monkeypatch.setenv("ADMIN_TOKEN", "short")
-    monkeypatch.setenv("BOT_API_KEY", "b" * 40)
+    monkeypatch.setenv("SERVICE_API_KEY", "b" * 40)
     with pytest.raises(ConfigError):
         load_settings()
     monkeypatch.setenv("ADMIN_TOKEN", "b" * 40)
     with pytest.raises(ConfigError):
-        load_settings()  # same value as the bot key
+        load_settings()  # same value as the service key
     monkeypatch.setenv("ADMIN_TOKEN", "a" * 40)
     monkeypatch.setenv("CORS_ORIGINS", "*")
     with pytest.raises(ConfigError):
