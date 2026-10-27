@@ -535,3 +535,22 @@ html.motion .teams .team:nth-child(n+4), html.motion .requests .request:nth-chil
 }
 
 .ledger li.empty { display: block; }
+
+/* ================================================================== SPLASH (home page)
+   Pure CSS timeline, so it always clears itself even if scripts fail; site.js only skips it on repeat visits. */
+.splash { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--sand);
+          animation: splash-out .7s cubic-bezier(.7, 0, .2, 1) 1.6s forwards; }
+.splash-inner { display: grid; justify-items: center; gap: 1.1rem; }
+.splash-mark { width: 104px; height: 104px; animation: splash-pop .7s cubic-bezier(.2, 1.4, .4, 1) both; }
+.splash-sweep { transform-origin: 16px 16px; animation: splash-spin 1.1s cubic-bezier(.4, 0, .2, 1) .2s both; }
+.splash-blip { transform-origin: 21.5px 20.5px; animation: splash-ping .5s ease-out .9s both; }
+.splash-word { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.2rem); line-height: 1; letter-spacing: -.01em;
+               animation: splash-rise .6s cubic-bezier(.2, .8, .2, 1) .45s both; }
+.splash-word .tld { color: var(--action); font-style: italic; }
+.splash.skip { display: none; }
+@keyframes splash-pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes splash-spin { from { transform: rotate(-200deg); } to { transform: rotate(0); } }
+@keyframes splash-ping { 0% { transform: scale(0); } 70% { transform: scale(1.35); } 100% { transform: scale(1); } }
+@keyframes splash-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes splash-out { to { opacity: 0; transform: scale(1.04); visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .splash { display: none !important; } }

@@ -9,6 +9,23 @@
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
+  // ------------------------------------------------------------------ splash: once per browser session
+  const splash = document.getElementById('splash');
+  let splashDelay = 0;
+  if (splash) {
+    let seen = false;
+    try { seen = sessionStorage.getItem('radiup.splash') === '1'; sessionStorage.setItem('radiup.splash', '1'); } catch { /* storage off */ }
+    if (seen || reduceMotion) {
+      splash.classList.add('skip');
+    } else {
+      splashDelay = 1700;  // let the hero animate in as the splash lifts
+      const done = () => splash.classList.add('skip');
+      splash.addEventListener('animationend', (e) => { if (e.animationName === 'splash-out') done(); });
+      splash.addEventListener('click', done);
+      document.addEventListener('keydown', done, { once: true });
+    }
+  }
+
   const LIFT = '.fact, .step, .panel, .stat, .team, .request, .form-card, .numbers > div, .signin .card, .phone';
   const REVEAL = [
     '.hero .kicker', '.hero h1', '.hero .lede', '.hero .hero-actions', '.fact',
@@ -100,7 +117,8 @@
     const parent = el.parentElement;
     const index = seen.get(parent) || 0;
     seen.set(parent, index + 1);
-    el.style.setProperty('--d', `${Math.min(index, 6) * 90}ms`);
+    const extra = el.closest('.hero') ? splashDelay : 0;
+    el.style.setProperty('--d', `${extra + Math.min(index, 6) * 90}ms`);
     el.classList.add('reveal');
   });
   const io = new IntersectionObserver((entries) => {
