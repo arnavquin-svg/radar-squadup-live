@@ -228,3 +228,11 @@ The bot schedules reminders 7, 2 and 1 day before the event at `REMINDER_HOUR` i
 ## Configuration
 
 All settings come from environment variables; see `.env.example` for the full list with comments.
+# Browser-based SquadUp registration
+
+Tracked outreach, event, and teammate referral links open the mobile web join flow at `/join/?start=...`. Participants choose a role, enter their name, and select their experience level; registration is handled by the existing SquadUp team balancer. After joining, they can invite teammates through WhatsApp.
+
+The link base is selected in this order: `SITE_URL`, Render's `RENDER_EXTERNAL_URL`, then `http://localhost:8000` for local development. Set `SITE_URL` to the public HTTPS origin when deploying on a host that does not provide `RENDER_EXTERNAL_URL`. The Telegram bot remains available independently; the browser registration path does not require a Telegram account or bot token.
+
+The public browser endpoints (`/api/join/resolve`, `/api/join/click`, and `/api/join/register`) use the app's existing per-IP API rate limit. Participant confirmation and withdrawal remain service-key protected.
+

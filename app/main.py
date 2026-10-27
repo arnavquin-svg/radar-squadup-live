@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
 import random
 import secrets
 import sqlite3
@@ -65,7 +66,8 @@ public = APIRouter(prefix="/api")
 # Helpers
 # --------------------------------------------------------------------------- #
 def tracked_link(payload: str) -> str:
-    return f"https://t.me/{get_settings().bot_username}?start={payload}"
+    base = (os.getenv("SITE_URL") or os.getenv("RENDER_EXTERNAL_URL") or "http://localhost:8000").rstrip("/")
+    return f"{base}/join/?start={payload}"
 
 
 def get_event_or_404(conn: sqlite3.Connection, event_id: int) -> dict[str, Any]:
@@ -539,6 +541,34 @@ def track_click(payload: str = Query(..., max_length=64, pattern=PAYLOAD_RE.patt
         if info["kind"] == "community":
             conn.execute("UPDATE outreach SET clicks = clicks + 1 WHERE id = ?", (info["outreach_id"],))
     return {"tracked": info["kind"] == "community", "kind": info["kind"], "event_id": info["event"]["id"]}
+
+
+# Browser join flow. These public endpoints intentionally expose only the data
+# needed to register; RateLimitMiddleware applies the normal per-IP API budget.
+@public.get("/join/resolve", tags=["join"])
+def public_resolve(payload: Optional[str] = Query(None, max_length=64, pattern=PAYLOAD_RE.pattern)) -> dict[str, Any]:
+    with connect() as conn:
+        info = resolve_payload(conn, payload)
+        return {key: info[key] for key in ("kind", "event", "community_name", "referrer", "payload")}
+
+
+@public.post("/join/click", tags=["join"])
+def public_track_click(payload: str = Query(..., max_length=64, pattern=PAYLOAD_RE.pattern)) -> dict[str, Any]:
+    with connect() as conn:
+        info = resolve_payload(conn, payload)
+        if info["kind"] == "community":
+            conn.execute("UPDATE outreach SET clicks = clicks + 1 WHERE id = ?", (info["outreach_id"],))
+    return {"tracked": info["kind"] == "community"}
+
+
+@public.post("/join/register", tags=["join"])
+def public_register(body: RegistrationCreate) -> dict[str, Any]:
+    with connect() as conn:
+        participant, created = register_participant(conn, body)
+    return {key: participant[key] for key in ("id", "name", "event_id", "event_name", "start_date",
+                                                "event_city", "team_number", "team", "invite_link", "status")} | {
+        "created": created,
+    }
 
 
 # --------------------------------------------------------------------------- #

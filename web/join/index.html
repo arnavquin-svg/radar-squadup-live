@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta name="theme-color" content="#F4EFE4" />
+<title>Join a team · RadiUp.ai</title>
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="/assets/site.css" />
+<link rel="stylesheet" href="/assets/join.css" />
+<script src="/assets/join.js" defer></script>
+</head>
+<body class="join-page">
+<header class="join-top"><a class="wordmark" href="/"><img class="mark" src="/assets/mark.svg" alt="" width="22" height="22" /><span>RadiUp<span class="tld">.ai</span></span></a><span class="join-tag">SQUADUP</span></header>
+<main class="join-shell">
+  <section class="join-card" aria-live="polite">
+    <div class="chat-head"><span class="chat-avatar">R</span><div><strong>RadiUp team match</strong><small id="event-label">Getting your event…</small></div><span class="online-dot" aria-label="Online"></span></div>
+    <div id="chat" class="chat-log">
+      <div class="bubble bot">Hi! Let’s find your place on a team. It takes three quick steps.</div>
+      <div class="bubble bot" id="prompt">You came in through your community. What will you bring to a team?</div>
+      <div class="choices" id="roles" aria-label="Choose your role">
+        <button type="button" data-value="developer">💻 Developer</button><button type="button" data-value="designer">🎨 Designer</button><button type="button" data-value="domain_expert">🧠 Domain expert</button><button type="button" data-value="presenter">🎤 Presenter</button>
+      </div>
+      <div class="step hidden" id="name-step"><label for="name">What should teammates call you?</label><form id="name-form"><input id="name" name="name" maxlength="80" autocomplete="name" placeholder="Your name" required /><button class="send" aria-label="Continue">→</button></form></div>
+      <div class="step hidden" id="experience-step"><p>How many hackathons have you joined?</p><div class="choices"><button type="button" data-exp="first_time">This is my first</button><button type="button" data-exp="some">1–2 before</button><button type="button" data-exp="veteran">3 or more</button></div></div>
+    </div>
+    <div id="error" class="join-error" role="alert"></div>
+    <div id="result" class="result hidden"></div>
+    <div id="loading" class="loading hidden">Finding your teammates…</div>
+    <div class="join-foot"><span>Balanced teams, matched by skills</span><span>Powered by RadiUp.ai</span></div>
+  </section>
+  <p class="join-note">Your details help us build a balanced team. No Telegram account needed.</p>
+</main>
+</body>
+</html>
