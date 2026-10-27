@@ -56,7 +56,7 @@
     return `${Math.floor(s / 86400)} d ago`;
   };
   const isoDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  const clickLabel = (n) => `${fmt(n)} ${Number(n) === 1 ? 'click' : 'clicks'}`;
+  const clicks = (n) => `${fmt(n)} ${Number(n) === 1 ? 'click' : 'clicks'}`;
   const pct = (part, whole) => (whole ? Math.round((part / whole) * 100) : 0);
 
   const session = {
@@ -359,7 +359,7 @@
     $('#sources').innerHTML = s.by_source.length
       ? s.by_source.slice(0, 8).map(x => ledgerRow(esc(x.label), x.registrations, (x.registrations / srcMax) * 100,
           x.platform === 'referral' ? 'bg-marigold' : x.platform === 'direct' ? 'bg-muted' : 'bg-sky',
-          x.clicks != null ? clickLabel(x.clicks) : '')).join('')
+          x.clicks != null ? clicks(x.clicks) : '')).join('')
       : '<li class="empty">No approved messages yet. Approve one in Outreach and send it to the admin; sign-ups through it appear here.</li>';
 
     const total = Object.values(s.roles).reduce((a, b) => a + b, 0);
@@ -483,7 +483,7 @@
     $('#letters').innerHTML = list.length ? list.map(o => `
       <li><button data-oid="${o.id}" aria-current="${o.id === state.selected}">
         <span class="status-dot ${dot[o.status]}" aria-hidden="true"></span>
-        <span><span class="name">${esc(o.community_name)}</span><br /><span class="meta">${esc(o.language_name)}, ${esc(PLATFORM[o.platform] || o.platform)}${o.status === 'approved' ? `, ${clickLabel(o.clicks)}` : ''}</span></span>
+        <span><span class="name">${esc(o.community_name)}</span><br /><span class="meta">${esc(o.language_name)}, ${esc(PLATFORM[o.platform] || o.platform)}${o.status === 'approved' ? `, ${clicks(o.clicks)}` : ''}</span></span>
         <span class="score-sm num">${Math.round(o.score)}</span></button></li>`).join('')
       : `<li class="empty">${state.outreach.length ? 'Nothing in this list.' : 'No messages yet. Run Radar to draft one for each matching group.'}</li>`;
     $$('#letters [data-oid]').forEach(b => b.addEventListener('click', () => { state.selected = Number(b.dataset.oid); renderOutreach(); }));
@@ -520,7 +520,7 @@
       </div>
       <div class="editor-actions">
         ${approved
-          ? `<span class="left">${clickLabel(o.clicks)} so far</span><button class="btn btn-quiet" id="ed-reset">Move back to review</button>`
+          ? `<span class="left">${clicks(o.clicks)} so far</span><button class="btn btn-quiet" id="ed-reset">Move back to review</button>`
           : `${o.status === 'rejected' ? '<button class="btn btn-quiet" id="ed-reset">Move back to review</button>' : '<button class="btn btn-danger" id="ed-reject">Skip this group</button>'}
              <button class="btn btn-paper" id="ed-save" disabled>Save edits</button>
              <button class="btn btn-primary" id="ed-approve">Approve message</button>`}
